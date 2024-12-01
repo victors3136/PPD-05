@@ -1,10 +1,13 @@
+package polynomials;
+
 public class SequentialKaratsubaPolynomialMultiplication implements PolynomialMultiplicationStrategy {
 
     protected Polynomial karatsuba(Polynomial lhs, Polynomial rhs) {
-        final var rank = Math.max(lhs.rank(), rhs.rank());
+        final var rank =Math.max(lhs.rank(), rhs.rank());
         if (rank <= 1) {
             return new Polynomial(lhs.first() * rhs.first());
         }
+
         final var halfRank = rank / 2;
 
         final var lowLhs = lhs.slice(0, halfRank);

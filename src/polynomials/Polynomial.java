@@ -1,3 +1,5 @@
+package polynomials;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,16 +40,15 @@ public record Polynomial(int[] coefficients, int rank) {
 
     public Polynomial slice(int start, int end) {
         assert start >= 0;
-        assert end > 0;
         assert end >= start;
+
         final var size = end - start;
-        final var subCoefficients = new int[size];
-        for (int current = start; current < end; current++) {
-            if (current < rank) {
-                subCoefficients[current - start] = coefficients[current];
-            }
-        }
-        return new Polynomial(subCoefficients);
+        final var dest = new int[size];
+
+        final var truncEnd = Math.min(end, rank);
+        final var copySize = Math.max(0, truncEnd - start);
+        System.arraycopy(coefficients, start, dest, 0, copySize);
+        return new Polynomial(dest);
     }
 
     public Polynomial sub(Polynomial other) {
@@ -77,15 +78,15 @@ public record Polynomial(int[] coefficients, int rank) {
 
     static Polynomial merge(Polynomial low, Polynomial middle, Polynomial high, int rank) {
         final var result = new ArrayList<>(Collections.nCopies(2 * rank - 1, 0));
-        for (var index = 0; index < low.rank(); index++) {
+        for (var index = 0; index < low.rank(); ++index) {
             result.set(index, result.get(index) + low.get(index));
-            result.set(index + rank, result.get(index + rank) + high.get(index));
             result.set(index + rank / 2, result.get(index + rank / 2) + middle.get(index));
+            result.set(index + rank, result.get(index + rank) + high.get(index));
         }
         return new Polynomial(result);
     }
 
-    static Polynomial getRandom(int size) {
+    public static Polynomial getRandom(int size) {
         assert size > 0;
         final var base = new int[size];
         final var rand = new Random();

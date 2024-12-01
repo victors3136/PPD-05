@@ -1,3 +1,5 @@
+package polynomials;
+
 import java.util.concurrent.*;
 
 public class ParallelKaratsubaPolynomialMultiplication implements PolynomialMultiplicationStrategy {
@@ -17,6 +19,8 @@ public class ParallelKaratsubaPolynomialMultiplication implements PolynomialMult
         if (rank <= 1) {
             return new Polynomial(lhs.first() * rhs.first());
         }
+
+
         final var halfRank = rank / 2;
 
         final var lowLhs = lhs.slice(0, halfRank);
