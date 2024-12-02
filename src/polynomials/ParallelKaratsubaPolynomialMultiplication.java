@@ -5,21 +5,24 @@ import java.util.concurrent.*;
 public class ParallelKaratsubaPolynomialMultiplication implements PolynomialMultiplicationStrategy {
     private final ForkJoinPool pool;
 
-    public ParallelKaratsubaPolynomialMultiplication(int threadPoolSize) {
+    public ParallelKaratsubaPolynomialMultiplication() {
         this.pool = new ForkJoinPool();
     }
 
-    public ParallelKaratsubaPolynomialMultiplication() {
-        this(Runtime.getRuntime().availableProcessors());
+    private static int getSmallestPowOf2LargerThan(int num) {
+        int result = 1;
+        while (result < num) {
+            result <<= 1;
+        }
+        return result;
     }
 
     protected Polynomial karatsuba(Polynomial lhs, Polynomial rhs) throws ExecutionException, InterruptedException {
-        final var rank = Math.max(lhs.rank(), rhs.rank());
-
-        if (rank <= 1) {
+        final var realRank = Math.max(lhs.rank(), rhs.rank());
+        if (realRank <= 1) {
             return new Polynomial(lhs.first() * rhs.first());
         }
-
+        final var rank = getSmallestPowOf2LargerThan(realRank);
 
         final var halfRank = rank / 2;
 

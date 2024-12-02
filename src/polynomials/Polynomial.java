@@ -1,10 +1,6 @@
 package polynomials;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
+import java.util.*;
 
 public record Polynomial(int[] coefficients, int rank) {
     public Polynomial {
@@ -67,13 +63,7 @@ public record Polynomial(int[] coefficients, int rank) {
 
     @Override
     public String toString() {
-        var str = IntStream.range(0, rank)
-                .filter(i -> coefficients[i] != 0)
-                .mapToObj(index -> (index > 0 ? "+ " : "")
-                        + coefficients[index]
-                        + (index == 0 ? "" : " X" + (index != 1 ? "^" + (index + 1) : "")) + " ")
-                .reduce("", (s1, s2) -> s1 + s2);
-        return !str.isEmpty() ? str : "0 ";
+        return Arrays.stream(coefficients).sequential().mapToObj(String::valueOf).reduce("", (a, b) -> a + " " + b);
     }
 
     static Polynomial merge(Polynomial low, Polynomial middle, Polynomial high, int rank) {

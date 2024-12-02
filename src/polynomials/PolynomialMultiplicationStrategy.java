@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface PolynomialMultiplicationStrategy {
 
-    static List<Integer> setup(int rank) {
-        return new ArrayList<>(Collections.nCopies(rank, 0));
+    static int[] setup(int rank) {
+        return new int[rank];
     }
 
     Polynomial mul(Polynomial lhs, Polynomial rhs);

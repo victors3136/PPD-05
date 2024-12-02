@@ -1,6 +1,6 @@
 import polynomials.*;
 
-import java.util.Objects;
+import java.util.Arrays;
 
 /*
     ===========WARMUP===========
@@ -118,96 +118,96 @@ public class Main {
         return sequentialSimpleResult;
     }
 
+    private static int[] truncToSize(Polynomial polynomial, int size) {
+        return Arrays.stream(polynomial.coefficients(), 0, size).toArray();
+    }
+
     private static final int lhsRank = 7883;
     private static final int rhsRank = 7901;
-    private static final int warmupUB = 41;
+    private static final int warmupUB = 17;
     private static final int warmupLhsLB = 6553;
     private static final int warmupLhsUB = 7907;
     private static final int warmupRhsLB = 6563;
     private static final int warmupRhsUB = 7919;
 
     public static void main(String[] args) {
-        // Using prime numbers to screw up caching
-
+        System.out.println(new Polynomial(1, 1)
+                .mul(new Polynomial(1, 2, 1),
+                        new SequentialNSquaredPolynomialMultiplication()));
+        System.out.println(new Polynomial(1, 1)
+                .mul(new Polynomial(1, 2, 1),
+                        new ParallelNSquaredPolynomialMultiplication()));
+        System.out.println(new Polynomial(1, 1)
+                .mul(new Polynomial(1, 2, 1),
+                        new SequentialKaratsubaPolynomialMultiplication()));
+        System.out.println(new Polynomial(1, 1)
+                .mul(new Polynomial(1, 2, 1),
+                        new ParallelKaratsubaPolynomialMultiplication()));
         // warm up the JIT
-        System.out.println("===========WARMUP===========");
-        for (var index = 0; index < warmupUB; ++index) {
-            long startTime = System.nanoTime();
-            final var warmupLhsRank = (int) (Math.random() * (warmupLhsUB - warmupLhsLB) + warmupLhsLB);
-            final var warmupRhsRank = (int) (Math.random() * (warmupRhsUB - warmupRhsLB) + warmupRhsLB);
-            System.out.println("Warming up the JIT with ranks " + warmupLhsRank + " and " + warmupRhsRank + " [ "
-                    + (index + 1) + "/" + warmupUB + "]");
-            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
-                    new SequentialNSquaredPolynomialMultiplication());
-            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
-                    new ParallelNSquaredPolynomialMultiplication());
-            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
-                    new SequentialKaratsubaPolynomialMultiplication());
-            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
-                    new ParallelKaratsubaPolynomialMultiplication());
-            long endTime = System.nanoTime();
-            System.out.println("Time: " + (endTime - startTime) / 1e6 + " ms");
-        }
+//        System.out.println("===========WARMUP===========");
+//        for (var index = 0; index < warmupUB; ++index) {
+//            long startTime = System.nanoTime();
+//            final var warmupLhsRank = (int) (Math.random() * (warmupLhsUB - warmupLhsLB) + warmupLhsLB);
+//            final var warmupRhsRank = (int) (Math.random() * (warmupRhsUB - warmupRhsLB) + warmupRhsLB);
+//            System.out.println("Warming up the JIT with ranks " + warmupLhsRank + " and " + warmupRhsRank + " [ "
+//                    + (index + 1) + "/" + warmupUB + "]");
+//            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
+//                    new SequentialNSquaredPolynomialMultiplication());
+//            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
+//                    new ParallelNSquaredPolynomialMultiplication());
+//            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
+//                    new SequentialKaratsubaPolynomialMultiplication());
+//            Polynomial.getRandom(warmupLhsRank).mul(Polynomial.getRandom(warmupRhsRank),
+//                    new ParallelKaratsubaPolynomialMultiplication());
+//            long endTime = System.nanoTime();
+//            System.out.println("Time: " + (endTime - startTime) / 1e6 + " ms");
+//        }
         // Benchmark
         System.out.println("\n===========BENCHMARK===========");
-        final Polynomial sequentialSimpleResult;
-        final Polynomial parallelSimpleResult;
-        final Polynomial sequentialKaratsubaResult;
-        final Polynomial parallelKaratsubaResult;
-        {
-            final var leftHandSide = Polynomial.getRandom(lhsRank);
-            final var rightHandSize = Polynomial.getRandom(rhsRank);
-            sequentialSimpleResult = multiplyWrapper(
-                    leftHandSide,
-                    rightHandSize,
-                    new SequentialNSquaredPolynomialMultiplication(),
-                    "Standard Sequential");
-        }
-        {
-            final var leftHandSide = Polynomial.getRandom(lhsRank);
-            final var rightHandSize = Polynomial.getRandom(rhsRank);
-            parallelSimpleResult = multiplyWrapper(
-                    leftHandSide,
-                    rightHandSize,
-                    new ParallelNSquaredPolynomialMultiplication(),
-                    "Standard Parallel");
-        }
-        {
-            final var leftHandSide = Polynomial.getRandom(lhsRank);
-            final var rightHandSize = Polynomial.getRandom(rhsRank);
-            sequentialKaratsubaResult = multiplyWrapper(
-                    leftHandSide,
-                    rightHandSize,
-                    new SequentialKaratsubaPolynomialMultiplication(),
-                    "Karatsuba Sequential");
-        }
-        {
-            final var leftHandSide = Polynomial.getRandom(lhsRank);
-            final var rightHandSize = Polynomial.getRandom(rhsRank);
-            parallelKaratsubaResult = multiplyWrapper(
-                    leftHandSide,
-                    rightHandSize,
-                    new ParallelKaratsubaPolynomialMultiplication(),
-                    "Karatsuba Parallel");
+        final var leftHandSide = Polynomial.getRandom(lhsRank);
+        final var rightHandSize = Polynomial.getRandom(rhsRank);
+        final Polynomial sequentialSimpleResult = multiplyWrapper(
+                leftHandSide,
+                rightHandSize,
+                new SequentialNSquaredPolynomialMultiplication(),
+                "Standard Sequential");
+        final Polynomial parallelSimpleResult = multiplyWrapper(
+                leftHandSide,
+                rightHandSize,
+                new ParallelNSquaredPolynomialMultiplication(),
+                "Standard Parallel");
+        final Polynomial sequentialKaratsubaResult = multiplyWrapper(
+                leftHandSide,
+                rightHandSize,
+                new SequentialKaratsubaPolynomialMultiplication(),
+                "Karatsuba Sequential");
+        final Polynomial parallelKaratsubaResult = multiplyWrapper(
+                leftHandSide,
+                rightHandSize,
+                new ParallelKaratsubaPolynomialMultiplication(),
+                "Karatsuba Parallel");
 
-        }
-        // Verify Results :)
+        // Verify Results
         System.out.println("\n===========CHECK===========");
         final var size = sequentialSimpleResult.rank();
-        assert size == parallelSimpleResult.rank();
-        for (var index = 0; index < size; ++index) {
-            assert Objects.equals(parallelSimpleResult.get(index), sequentialSimpleResult.get(index));
+
+        if (Arrays.equals(sequentialSimpleResult.coefficients(), parallelSimpleResult.coefficients())) {
+            System.out.println("Parallel Simple algorithm produced the same result as the Sequential Simple");
+        } else {
+            System.out.println("Parallel Simple algorithm did not produce the same result as the Sequential Simple");
         }
-        System.out.println("Parallel Simple algorithm produced the same result as the Sequential Simple");
-        assert size == sequentialKaratsubaResult.rank();
-        for (var index = 0; index < size; ++index) {
-            assert Objects.equals(sequentialKaratsubaResult.get(index), sequentialSimpleResult.get(index));
+
+        var truncatedSeqKaratsuba = truncToSize(sequentialKaratsubaResult, size);
+        if (Arrays.equals(sequentialSimpleResult.coefficients(), truncatedSeqKaratsuba)) {
+            System.out.println("Sequential Karatsuba algorithm produced the same result as the Sequential Simple");
+        } else {
+            System.out.println("Sequential Karatsuba algorithm did not produce the same result as the Sequential Simple");
         }
-        System.out.println("Sequential Karatsuba algorithm produced the same result as the Sequential Simple");
-        assert size == parallelKaratsubaResult.rank();
-        for (var index = 0; index < size; ++index) {
-            assert Objects.equals(parallelKaratsubaResult.get(index), sequentialSimpleResult.get(index));
+        var truncatedParallelKaratsuba = truncToSize(parallelKaratsubaResult, size);
+        if (Arrays.equals(sequentialSimpleResult.coefficients(), truncatedParallelKaratsuba)) {
+            System.out.println("Parallel Karatsuba algorithm produced the same result as the Sequential Simple");
+        } else {
+            System.out.println("Parallel Karatsuba algorithm did not produce the same result as the Sequential Simple");
         }
-        System.out.println("Parallel Simple algorithm produced the same result as the Sequential Simple");
     }
 }

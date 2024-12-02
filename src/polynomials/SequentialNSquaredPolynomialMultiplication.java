@@ -3,14 +3,15 @@ package polynomials;
 public class SequentialNSquaredPolynomialMultiplication implements PolynomialMultiplicationStrategy {
     @Override
     public Polynomial mul(Polynomial lhs, Polynomial rhs) {
-        var resultCoefficients = PolynomialMultiplicationStrategy.setup(lhs.rank() + rhs.rank());
-
-        for (var index = 0; index < resultCoefficients.size(); ++index) {
+        final var resultRank = lhs.rank() + rhs.rank();
+        final var resultCoefficients = PolynomialMultiplicationStrategy.setup(resultRank);
+        for (var index = 0; index < resultRank; ++index) {
             var total = 0;
-            for (var lhsId = 0; lhsId < index; ++lhsId) {
-                total += lhs.get(lhsId) + rhs.get(index - lhsId);
+            for (var lhsId = 0; lhsId <= index; ++lhsId) {
+                final var rhsId = index - lhsId;
+                total += lhs.get(lhsId) * rhs.get(rhsId);
             }
-            resultCoefficients.set(index, total);
+            resultCoefficients[index] = total;
         }
         return new Polynomial(resultCoefficients);
     }
